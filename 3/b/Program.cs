@@ -18,7 +18,7 @@
             }
 
             // now find first join visited location
-            var matchingcrossover = wires[0].VisitedLocations.Intersect(wires[1].VisitedLocations).OrderBy(l => wires[0].VisitedLocations.IndexOf(l) + wires[1].VisitedLocations.IndexOf(l)).Select(l => new { location = l, moves = wires[0].VisitedLocations.IndexOf(l) + wires[1].VisitedLocations.IndexOf(l) + 2 }).FirstOrDefault();
+            var matchingcrossover = wires[0].VisitedLocations.Intersect(wires[1].VisitedLocations).Select(l => new { location = l, moves = wires[0].VisitedLocations.IndexOf(l) + wires[1].VisitedLocations.IndexOf(l) + 2 }).OrderBy(l => l.moves).FirstOrDefault();
 
             Console.WriteLine($"cross over at {matchingcrossover.location} has min moves {matchingcrossover.moves}");
         }

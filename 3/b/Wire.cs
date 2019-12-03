@@ -8,7 +8,6 @@
     {
         private string[] moves;
         private Tuple<int, int> currentLocation = new Tuple<int, int>(0, 0);
-        private HashSet<string> visitedLocationslookup = new HashSet<string>();
         private List<string> visitedLocations = new List<string>();
 
         public Wire(string moves)
@@ -16,12 +15,6 @@
             // parse instructions
             this.moves = moves.Split(',');
             this.ProcessMoves();
-        }
-
-        public HashSet<string> VisitedLocationsLookup
-        {
-            get => this.visitedLocationslookup;
-            set => this.visitedLocationslookup = value;
         }
 
         public List<string> VisitedLocations { get => this.visitedLocations; set => this.visitedLocations = value; }
@@ -67,7 +60,6 @@
             while (distance > 0)
             {
                 this.currentLocation = new Tuple<int, int>(this.currentLocation.Item1 + movexy.Item1, this.currentLocation.Item2 + movexy.Item2);
-                this.VisitedLocationsLookup.Add($"{this.currentLocation.Item1},{this.currentLocation.Item2}");
                 this.VisitedLocations.Add($"{this.currentLocation.Item1},{this.currentLocation.Item2}");
                 distance--;
             }

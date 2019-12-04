@@ -14,7 +14,7 @@
             {
                 if (Matches(i.ToString()))
                 {
-                    Console.WriteLine(i);
+                    // Console.WriteLine(i);
                     matches++;
                 }
             }
@@ -24,27 +24,19 @@
 
         private static bool Matches(string number)
         {
-            var repeatedregex = @"(\w)\1+";
             if (number.Length != 6)
             {
                 return false;
             }
-            
-            if (!Regex.IsMatch(number, repeatedregex))
+
+            if (new string(number.ToCharArray().OrderBy(s => s).ToArray()) != number)
             {
                 return false;
             }
 
-            var chars = number.ToCharArray();
-            for (var i = 1; i < chars.Length; i++)
-            {
-                if (int.Parse(chars[i].ToString()) < int.Parse(chars[i - 1].ToString()))
-                {
-                    return false;
-                }
-            }
+            var repeatedregex = @"(\w)\1+";
 
-            return true;
+            return Regex.IsMatch(number, repeatedregex);
         }
     }
 }

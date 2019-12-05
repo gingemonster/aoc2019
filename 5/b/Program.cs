@@ -13,7 +13,7 @@
 
             var finished = false;
             var program = (int[])unchangedprogram.Clone();
-            var input = 5;
+            var input = 8;
             var output = -1;
 
             for (int i = 0; i < program.Length; i++)
@@ -51,7 +51,7 @@
                         /*
                         Opcode 4 outputs the value of its only parameter.For example, the instruction 4,50 would output the value at address 50.
                         */
-                        output = program[program[i + 1]];
+                        output = GetParameterValue(i, opcodearray, 1, program);
                         skipcharacters = 1;
                         break;
                     case 5:

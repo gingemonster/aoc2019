@@ -38,7 +38,8 @@
                 });
             });
 
-            var best = asteroids.OrderByDescending(a => a.OtherAsteroids.GroupBy(o => o.Item2).Count()).First();
+            var best = asteroids.OrderByDescending(a => a.CountVisibleOtherAsteroids()).First();
+            Console.WriteLine(best.CountVisibleOtherAsteroids().ToString());
         }
     }
 }

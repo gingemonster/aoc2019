@@ -7,7 +7,7 @@
 
     public class Asteroid
     {
-        private List<Tuple<int, double>> otherAsteroids = new List<Tuple<int, double>>();
+        private List<Tuple<int, Vector>> otherAsteroids = new List<Tuple<int, Vector>>();
 
         public int Id
         {
@@ -24,14 +24,14 @@
             get; set;
         }
 
-        public List<Tuple<int, double>> OtherAsteroids
+        public List<Tuple<int, Vector>> OtherAsteroids
         {
             get => this.otherAsteroids; set => this.otherAsteroids = value;
         }
 
         public int CountVisibleOtherAsteroids()
         {
-            return this.OtherAsteroids.GroupBy(o => o.Item2).Count();
+            return this.OtherAsteroids.GroupBy(o => o.Item2.Angle).Count();
         }
     }
 }

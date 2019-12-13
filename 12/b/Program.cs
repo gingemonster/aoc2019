@@ -6,6 +6,8 @@
     using System.Linq;
     using System.Text;
     using System.Text.RegularExpressions;
+    using System.Threading;
+    using System.Threading.Tasks;
 
     internal class Program
     {
@@ -24,10 +26,10 @@
             var axis = new List<string> { "x", "y", "z" };
             var repeatsat = new List<long>();
 
-            axis.ForEach(a =>
+            Parallel.ForEach(axis, (a) =>
             {
                 long ticks = 0;
-                var states = new HashSet<string>();
+                var firststate = string.Empty;
 
                 while (true)
                 {
@@ -41,14 +43,16 @@
 
                     moons.ForEach(m => m.ApplyVelocity(a));
                     var state = GetState(moons, a);
-                    if (states.Contains(state))
+                    if (ticks == 0)
                     {
-                        Console.WriteLine($"{a} repeated at {ticks}");
+                        firststate = state;
+                    }
+                    else if (firststate == state)
+                    {
+                        // Console.WriteLine($"{a} repeated at {ticks}");
                         repeatsat.Add(ticks);
                         break;
                     }
-
-                    states.Add(state);
 
                     ticks++;
                 }
@@ -59,23 +63,23 @@
 
         private static string GetState(List<Moon> moons, string axis)
         {
-            var result = new StringBuilder();
+            var result = string.Empty;
             moons.ForEach(m =>
             {
                 switch (axis)
                 {
                     case "x":
-                        result.Append($"{m.X},{m.VX},");
+                        result += $"{m.X},{m.VX},";
                         break;
                     case "y":
-                        result.Append($"{m.Y},{m.VY},");
+                        result += $"{m.Y},{m.VY},";
                         break;
                     case "z":
-                        result.Append($"{m.Z},{m.VZ},");
+                        result += $"{m.Z},{m.VZ},";
                         break;
                 }
             });
-            return result.ToString();
+            return result;
         }
 
         private static long LCM(long[] numbers)

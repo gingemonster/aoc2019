@@ -13,16 +13,16 @@
             var spareingredience = new List<Ingredient>();
             var remainingore = 1000000000000;
             var fuelmade = 0;
+            var knownorderofreactions = GetKnowOrderOfReactions(ParseReactions(args[0]));
 
             while (remainingore > 0)
             {
-                var reactions = ParseReactions(args[0]);
+                var reactions = new Queue<Reaction>(knownorderofreactions);
 
                 // work back to find all ingrediant and quanity needed for 1 fuel
                 while (true)
                 {
-                    var reaction = FindFirstReactionWithNoDependants(reactions);
-                    reactions.Remove(reaction);
+                    var reaction = reactions.Dequeue();
 
                     if (reaction.Output.Item1 == "FUEL")
                     {
@@ -46,10 +46,24 @@
                 ingredienceneeded.Clear();
                 remainingore -= orerequired;
                 fuelmade++;
+
                 Console.WriteLine(remainingore);
             }
 
             Console.WriteLine($"fuel {fuelmade}");
+        }
+
+        private static List<Reaction> GetKnowOrderOfReactions(List<Reaction> reactions)
+        {
+            var known = new List<Reaction>();
+            while (reactions.Any())
+            {
+                var reaction = FindFirstReactionWithNoDependants(reactions);
+                reactions.Remove(reaction);
+                known.Add(reaction);
+            }
+
+            return known;
         }
 
         private static List<Reaction> ParseReactions(string inputfile)

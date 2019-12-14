@@ -9,48 +9,95 @@
     {
         private static void Main(string[] args)
         {
-            var ingredienceneeded = new List<Ingredient>();
-            var spareingredience = new List<Ingredient>();
-            var remainingore = 1000000000000;
-            var fuelmade = 0;
             var knownorderofreactions = GetKnowOrderOfReactions(ParseReactions(args[0]));
+            long fuelneeded = 1;
 
-            while (remainingore > 0)
+            var orerequired = CalculateOreNeeedtoGenerateFuel(knownorderofreactions, fuelneeded);
+
+            // we can generate at least this much fuel from one trillion ore
+            var minfuelfortrillionore = 1000000000000 / orerequired;
+
+            var guess = minfuelfortrillionore;
+            long lastoreneeded = 0;
+            var guessteps = 1000000;
+            var guessesgoingup = true;
+
+            while (lastoreneeded != 1000000000000)
             {
-                var reactions = new Queue<Reaction>(knownorderofreactions);
+                lastoreneeded = CalculateOreNeeedtoGenerateFuel(knownorderofreactions, guess);
 
-                // work back to find all ingrediant and quanity needed for 1 fuel
-                while (true)
+                if (guessteps == 1)
                 {
-                    var reaction = reactions.Dequeue();
-
-                    if (reaction.Output.Item1 == "FUEL")
+                    if (CalculateOreNeeedtoGenerateFuel(knownorderofreactions, guess) < 1000000000000 && CalculateOreNeeedtoGenerateFuel(knownorderofreactions, guess + 1) > 1000000000000)
                     {
-                        ingredienceneeded.Add(new Ingredient("FUEL", 1));
+                        break;
                     }
 
-                    // take first needed
-                    var needed = ingredienceneeded.Where(i => i.Name == reaction.Output.Item1).First();
-                    ingredienceneeded.Remove(needed);
-
-                    // get its parts
-                    GetIngredienceFromReaction(reaction, ingredienceneeded, spareingredience, needed.Quantity);
-
-                    if (ingredienceneeded.Count == 1)
+                    if (CalculateOreNeeedtoGenerateFuel(knownorderofreactions, guess) > 1000000000000 && CalculateOreNeeedtoGenerateFuel(knownorderofreactions, guess - 1) < 1000000000000)
                     {
+                        guess--;
                         break;
                     }
                 }
 
-                var orerequired = ingredienceneeded[0].Quantity;
-                ingredienceneeded.Clear();
-                remainingore -= orerequired;
-                fuelmade++;
+                if (lastoreneeded < 1000000000000)
+                {
+                    if (!guessesgoingup)
+                    {
+                        guessesgoingup = true;
+                        guessteps = guessteps / 10;
+                    }
 
-                Console.WriteLine(remainingore);
+                    guess += guessteps;
+                }
+                else
+                {
+                    if (guessesgoingup)
+                    {
+                        guessesgoingup = false;
+                        guessteps = guessteps / 10;
+                    }
+
+                    guess -= guessteps;
+                }
             }
 
-            Console.WriteLine($"fuel {fuelmade}");
+            Console.WriteLine($"{lastoreneeded} ore required for {guess} fuel");
+        }
+
+        private static long CalculateOreNeeedtoGenerateFuel(List<Reaction> knownorderofreactions, long fuelneeded)
+        {
+            var ingredienceneeded = new List<Ingredient>();
+            var reactions = new Queue<Reaction>(knownorderofreactions);
+
+            var spareingredience = new List<Ingredient>();
+
+            // work back to find all ingrediant and quanity needed for 1 fuel
+            while (true)
+            {
+                var reaction = reactions.Dequeue();
+
+                if (reaction.Output.Item1 == "FUEL")
+                {
+                    ingredienceneeded.Add(new Ingredient("FUEL", fuelneeded));
+                }
+
+                // take first needed
+                var needed = ingredienceneeded.Where(i => i.Name == reaction.Output.Item1).First();
+                ingredienceneeded.Remove(needed);
+
+                // get its parts
+                GetIngredienceFromReaction(reaction, ingredienceneeded, spareingredience, needed.Quantity);
+
+                if (ingredienceneeded.Count == 1)
+                {
+                    break;
+                }
+            }
+
+            var orerequired = ingredienceneeded[0].Quantity;
+            ingredienceneeded.Clear();
+            return orerequired;
         }
 
         private static List<Reaction> GetKnowOrderOfReactions(List<Reaction> reactions)
@@ -77,10 +124,10 @@
             return reactions;
         }
 
-        private static void GetIngredienceFromReaction(Reaction reaction, List<Ingredient> partsneeded, List<Ingredient> spareingredients, int quantityneeded)
+        private static void GetIngredienceFromReaction(Reaction reaction, List<Ingredient> partsneeded, List<Ingredient> spareingredients, long quantityneeded)
         {
             // work out how many times the partsneeded
-            var multiples = (int)Math.Ceiling(quantityneeded / (double)reaction.Output.Item2);
+            var multiples = (long)Math.Ceiling(quantityneeded / (double)reaction.Output.Item2);
 
             // work out how much spare we would generate
             var sparegenerated = reaction.Output.Item2 - quantityneeded;

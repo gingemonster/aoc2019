@@ -6,7 +6,7 @@
 
     public class Ingredient
     {
-        public Ingredient(string name, int quantity)
+        public Ingredient(string name, long quantity)
         {
             this.Name = name;
             this.Quantity = quantity;
@@ -17,7 +17,7 @@
             get; set;
         }
 
-        public int Quantity
+        public long Quantity
         {
             get; set;
         }

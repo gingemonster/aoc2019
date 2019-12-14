@@ -20,6 +20,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Program - Copy.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
